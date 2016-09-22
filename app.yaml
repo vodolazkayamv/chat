@@ -1,0 +1,13 @@
+runtime: php55
+api_version: 1
+
+handlers:
+- url: /.*
+  script: helloworld.php
+
+env_variables:
+  # Replace project, instance, database, user and password with the values obtained
+  # when configuring your Cloud SQL instance.
+  MYSQL_DSN: mysql:unix_socket=/cloudsql/chat-project-144214:europe-west1:chatdb;dbname=chatDB
+  MYSQL_USER: root
+  MYSQL_PASSWORD: 'rootpass'
