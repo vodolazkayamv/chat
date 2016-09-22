@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Чатик группы А-13м-16</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="//cdn.jsdelivr.net/jquery.scrollto/2.1.2/jquery.scrollTo.min.js"></script>
+
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+
+<link rel="stylesheet" type="text/css" href="stylesheet.css" /> 
+<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+<link href="https://fonts.googleapis.com/css?family=Exo+2" rel="stylesheet">
+
+  <script>	  
+  $(document).ready(function(){
+	
+	 // CHECK ONLINE INTERVAL FUNCTION
+	 (function(){
+		 
+		 $.post('online.php', { userID: getCookie('userID')}, function( data ) {
+			
+			 var online = JSON.parse(data);
+
+			  var msg = $('.username:first');
+      		  $('.online').empty();
+			 
+			  for(i = 0; i < online.length; i++) {
+				msg.clone().appendTo('.online');
+              	$('.username:last').html(online[i].username);
+			  }
+		  //alert(data);
+	  });
+		 
+    	setTimeout(arguments.callee, 1000);
+	 })();
+	 
+	  
+	//alert( document.cookie );
+
+    $("#sendbtn").click(function(){
+
+		if ($('textarea').val() != "")
+			{
+      $.post('post-message.php', { userID: getCookie('userID'), message : $('textarea').val()}, function( data ) {
+		
+		  loadChat();
+		  $('textarea').val("");
+		  //alert(data);
+	  
+	  });
+			}
+ 
+    });
+
+function loadChat(){
+		  $.get('loadChat.php',function(data){
+			  //alert (data);
+			  var chat = JSON.parse(data);
+			  var i;
+          console.log("chat.length = " + chat.length);
+			  
+			  var msg = $('.msg:first');
+      		  $('.chat').empty();
+			  
+			  for(i = 0; i < chat.length; i++) {
+				msg.clone().appendTo('.chat');
+				  var str = chat[i].message;
+				  str = str.replace(/(?:\r\n|\r|\n)/g, '<br />');
+              	$('.msg:last .msgtext').html(str);
+				$('.msg:last #author').html(chat[i].username);
+              	$('.chat').scrollTo($('.msg:last'));
+			  }
+			  
+		  });
+	  }
+				
+     $("#refreshbtn").click(function(){
+
+		 loadChat();
+		 /*
+      var msg = $('.msg:first');
+      $('.chat').empty();
+      //msg.appendTo('.chat');
+
+      $.get('/2/1.txt',function(data){
+
+          var a = data.split("\n"), i;
+          console.log("a.length = " + a.length);
+          for (i = 0; i < a.length; i++) {
+            //console.log("a[" + i + "] : >" + a[i] + "<" + " \t a[i].length = " + a[i].length);
+            if (a[i].length > 1)
+            {
+              msg.clone().appendTo('.chat');
+              $('.msg:last .msgtext').html(a[i]);
+              $('.chat').scrollTo($('.msg:last'));
+            }
+          }
+        
+      });
+		 */
+    });
+	  
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i = 0; i <ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length,c.length);
+        }
+    }
+    return "";
+}
+
+function refresh() {
+
+  $.get('/2/1.txt',function(data){
+
+          $('.msg:first').clone().appendTo('.chat');
+
+          var a = data.split("\n");
+          console.log("a.length = " + a.length + " a[a.length-1] : >" + a[a.length-1] + "<");
+          console.log("a.length = " + a.length + " a[a.length-2] : >" + a[a.length-2] + "<");
+          $('.msg:last .msgtext').html(a[a.length-2]);        
+      });
+}
+
+// button animation
+     $('.btn-material').mousedown(function(e){
+      var target = e.target;
+      var rect = target.getBoundingClientRect();
+      var ripple = target.querySelector('.ripple');
+      $(ripple).remove();
+      ripple = document.createElement('span');
+      ripple.className = 'ripple';
+      ripple.style.height = ripple.style.width = Math.max(rect.width, rect.height) + 'px';
+      target.appendChild(ripple);
+      var top = e.pageY - rect.top - ripple.offsetHeight / 2 -  document.body.scrollTop;
+      var left = e.pageX - rect.left - ripple.offsetWidth / 2 - document.body.scrollLeft;
+      ripple.style.top = top + 'px';
+      ripple.style.left = left + 'px';
+      return false;
+  });
+});
+  </script>
+
+
+  <style type="text/css">
+    .jumbotron{
+        background: #FFC107; /* Цвет фона */
+    }
+    .tutorial {
+      font-family: 'Exo 2', sans-serif;
+      font-style: italic;
+      text-align : center;
+      padding: 30 px;
+      color: Grey;
+      text-shadow: 0.5px 0.5px LightGrey;
+    }
+    .userlist {      
+      background: #BBDEFB; /* Цвет фона */
+      padding: 10px; /* Поля вокруг текста */
+      height: 100%;
+      border-radius: 20px;
+    }
+    .userlist {
+      font: bold 150% Roboto;
+    }
+    .msg {      
+      font-family: 'Exo 2', sans-serif;
+      background: #FFD740; /* Цвет фона */
+      padding: 10px; /* Поля вокруг текста */
+      border-radius: 20px;
+      margin-top: 5px;
+    }
+    .username{
+      font: bold 90% serif;
+      color: #558B2F;
+    }
+    .msgtext{
+      font: 12pt Roboto; 
+      padding: 10px; /* Поля вокруг текста */
+    }
+    .writing {
+      margin-top: 25px;
+    }
+  </style>
+
+</head>
+<body>
+
+
+
+<div class="jumbotron text-center">
+  <h1>A-13M-16 Chat Page</h1>
+</div>
+  
+<div class="container">
+  
+    <div class="col-sm-2">
+    
+      <button class="btn-material teal" id="refreshbtn" style="width:100%;">Обновить</button>
+    </div>
+
+    <div class="col-sm-8">
+
+<!-- alert for new
+      <div class="alert alert-info">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+        <strong>Info!</strong> This alert box could indicate a neutral informative change or action.
+      </div>
+!-->
+
+      <div class="chat" style="overflow-y: scroll; overflow-x: hidden; height: 500px;">
+        
+        <div class="msg" id="msg1">
+        
+          <div class="md-chip teal">
+            <div class="md-chip-img">
+              <span class="md-chip-span orange"><img src="avatar.png"/></span>
+            </div>
+            <span class="md-chip-text"><div id="author">Message Author Chip</div></span> 
+          </div>
+                    
+          <div class="msgtext">Lorem ipsum dolor sit amet, consectetur adipisicing elit...</div>
+
+        </div>
+
+        <div class="tutorial">
+        <br/><br/>
+        <p>Руководство к действию:</p><br/>
+        <p>1) Нажмите на кнопку "Обновить", чтобы загрузить текущую переписку (файл /2/1.txt)</p>
+        <p>2) Введите свое сообщение в окно ниже и нажмите кнопку "Отправить", чтобы поучаствовать в переписке</p>
+        <p>3) Сообщение появится с некоторой задержкой</p>
+      </div>
+
+      </div>
+
+      <div class="writing">
+        <textarea name="comment" style="width:100%" rows="3" placeholder="Enter your message here..."></textarea>
+        
+        <button class="btn-material teal" id="sendbtn" style="width:100%;">Отправить сообщение</button>
+      </div>
+    </div>
+
+    <div class="col-sm-2">
+		<div class="online">
+			<div class="username">111</div>
+		</div>
+	</div>
+  
+</div>
+
+</body>
+</html>
+
